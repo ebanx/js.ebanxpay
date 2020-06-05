@@ -20,6 +20,7 @@ EBANX.deviceFingerprint.konduto = {
 			let period = 300;
 			let maxAttempts = 5;
 			let attempts = 0;
+			let deviceId = '';
 
 			let isAvailable = function(obj) {
 				return typeof(obj) != 'undefined';
@@ -34,12 +35,12 @@ EBANX.deviceFingerprint.konduto = {
 				attempts++;
 				if (isAvailable(window['Konduto']) && isAvailable(Konduto['getVisitorID'])) {
 					shouldClearInterval = true;
-					cb(Konduto.getVisitorID());
+					deviceId = Konduto.getVisitorID();
 				}
 
 				if (shouldClearInterval) {
 					clearInterval(intervalID);
-					cb('');
+					cb(deviceId);
 				}
 			};
 
