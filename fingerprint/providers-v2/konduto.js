@@ -10,31 +10,41 @@ EBANX.deviceFingerprint.konduto = {
 		__kdt.push({"public_key": settings.token});
 
 		var visitorId = (function() {
-			var kdt = document.createElement('script');
+			let kdt = document.createElement('script');
 			kdt.id = 'kdtjs'; kdt.type = 'text/javascript';
 			kdt.async = true;
 			kdt.src = 'https://i.k-analytix.com/k.js';
 
 			document.getElementsByTagName('head')[0].appendChild(kdt);
 
-			var period = 300;
-			var limit = 20e3;
-			var i = 0;
+			let period = 300;
+			let maxAttempts = 5;
+			let attempts = 0;
 
-			var isAvailable = function(obj) {
-				return typeof(obj) != "undefined";
+			let isAvailable = function(obj) {
+				return typeof(obj) != 'undefined';
 			};
 
-			var intervalID = setInterval(function() {
-				var clear = limit/period <= ++i;
+			let shouldClearInterval = false;
+			let isProviderInitialized = function() {
+				if (attempts >= maxAttempts) {
+					shouldClearInterval = true;
+				}
 
-				if (isAvailable(window["Konduto"]) && isAvailable(Konduto["getVisitorID"])) {
-					clear = true;
+				attempts++;
+				if (isAvailable(window['Konduto']) && isAvailable(Konduto['getVisitorID'])) {
+					shouldClearInterval = true;
 					cb(Konduto.getVisitorID());
 				}
 
-				if (clear) clearInterval(intervalID);
-			}, period);
+				if (shouldClearInterval) {
+					clearInterval(intervalID);
+					cb('');
+				}
+			};
+
+			let intervalID = setInterval(isProviderInitialized, period);
+
 		})();
 	}
 };
